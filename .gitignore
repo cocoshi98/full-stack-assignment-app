@@ -18,3 +18,9 @@ Thumbs.db
 # IDE files
 .vscode/
 .idea/
+
+# AI / editor tooling metadata
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
