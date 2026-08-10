@@ -9,11 +9,46 @@ services:
       POSTGRES_PASSWORD: taskapp_password
       POSTGRES_DB: task_assignment
 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
     ports:
       - "5432:5432"
 
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+  backend:
+    build:
+      context: ./backend
+
+    container_name: task-assignment-backend
+    restart: unless-stopped
+
+    depends_on:
+      - postgres
+
+    environment:
+      DATABASE_URL: postgresql://taskapp:taskapp_password@postgres:5432/task_assignment
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+
+    command: >
+      sh -c "npm run migrate:deploy &&
+             npx prisma db seed &&
+             npm start"
+    
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+
+    container_name: task-assignment-frontend
+    restart: unless-stopped
+
+    depends_on:
+      - backend
+
+    ports:
+      - "5173:80"
 
 volumes:
   postgres_data:
