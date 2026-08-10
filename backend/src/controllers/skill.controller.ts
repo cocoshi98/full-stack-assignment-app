@@ -1,22 +1,25 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 
 import { getAllSkills, getSkillById} from "../services/skill.service.js";
 
-export async function listSkills(req: Request, res: Response) {
+export async function listSkills(
+  req: Request, 
+  res: Response,
+  next: NextFunction) {
   try {
     const skills = await getAllSkills();
 
     res.json(skills);
   } catch (error) {
-    console.error("Failed to fetch skills:", error);
-
-    res.status(500).json({
-      error: "Failed to fetch skills",
-    });
+    next(error);
   }
 }
 
-export async function getSkill(req: Request, res: Response) {
+export async function getSkill(
+  req: Request, 
+  res: Response,
+  next: NextFunction
+) {
   try {
     const id = Number(req.params.id);
 
@@ -38,10 +41,6 @@ export async function getSkill(req: Request, res: Response) {
 
     res.json(skill);
   } catch (error) {
-    console.error("Failed to fetch skill:", error);
-
-    res.status(500).json({
-      error: "Failed to fetch skill",
-    });
+    next(error);
   }
 }

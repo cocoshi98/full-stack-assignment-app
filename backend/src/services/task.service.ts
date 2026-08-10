@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma.js";
+import { AppError } from "../errors/app-error.js";
 
 export interface CreateTaskInput {
   title: string;
@@ -23,7 +24,10 @@ export async function createTask(input: CreateTaskInput) {
   });
 
   if (skills.length !== uniqueSkillIds.length) {
-    throw new Error("INVALID_SKILLS");
+    throw new AppError(
+      400,
+      "One or more skill IDs do not exist"
+    );
   }
 
   if (input.parentTaskId !== undefined) {
@@ -34,7 +38,10 @@ export async function createTask(input: CreateTaskInput) {
     });
 
     if (!parentTask) {
-      throw new Error("PARENT_TASK_NOT_FOUND");
+      throw new AppError(
+        400,
+        "Parent task does not exist"
+      );
     }
   }
 
@@ -76,7 +83,10 @@ export async function updateTask(id: number, input: UpdateTaskInput) {
   });
 
   if (!task) {
-    throw new Error("TASK_NOT_FOUND");
+    throw new AppError(
+      404,
+      "Task not found"
+    );
   }
 
   if (input.developerId !== undefined && input.developerId !== null) {
@@ -90,7 +100,10 @@ export async function updateTask(id: number, input: UpdateTaskInput) {
     });
 
     if (!developer) {
-      throw new Error("DEVELOPER_NOT_FOUND");
+      throw new AppError(
+        400,
+        "Developer does not exist"
+      );
     }
 
     const developerSkillIds = new Set(
@@ -102,7 +115,10 @@ export async function updateTask(id: number, input: UpdateTaskInput) {
     );
 
     if (!hasAllRequiredSkills) {
-      throw new Error("DEVELOPER_MISSING_REQUIRED_SKILLS");
+      throw new AppError(
+        400,
+        "Developer does not have all required skills"
+      );
     }
   }
 
@@ -112,7 +128,10 @@ export async function updateTask(id: number, input: UpdateTaskInput) {
     );
 
     if (hasIncompleteSubtasks) {
-      throw new Error("SUBTASKS_NOT_DONE");
+      throw new AppError(
+        400,
+        "Task cannot be completed while subtasks are incomplete"
+      );
     }
   }
 

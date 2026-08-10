@@ -1,4 +1,8 @@
-import type { Request, Response } from "express";
+import type {
+  NextFunction,
+  Request,
+  Response
+} from "express";
 
 import { 
     createTask,
@@ -7,7 +11,11 @@ import {
     updateTask,
 } from "../services/task.service.js";
 
-export async function createTaskHandler(req: Request, res: Response) {
+export async function createTaskHandler(
+  req: Request, 
+  res: Response,
+  next: NextFunction
+) {
   try {
     const { title, skillIds, parentTaskId } = req.body;
 
@@ -48,31 +56,15 @@ export async function createTaskHandler(req: Request, res: Response) {
 
     res.status(201).json(task);
   } catch (error) {
-    if (error instanceof Error) {
-    if (error.message === "INVALID_SKILLS") {
-      res.status(400).json({
-        error: "One or more skill IDs do not exist",
-      });
-      return;
-    }
-
-    if (error.message === "PARENT_TASK_NOT_FOUND") {
-      res.status(400).json({
-        error: "Parent task does not exist",
-      });
-      return;
-    }
-  }
-
-  console.error("Failed to create task:", error);
-
-  res.status(500).json({
-    error: "Failed to create task",
-  });
+    next(error);
   }
 }
 
-export async function updateTaskHandler(req: Request, res: Response) {
+export async function updateTaskHandler(
+  req: Request, 
+  res: Response, 
+  next: NextFunction
+) {
   try {
     const id = Number(req.params.id);
 
@@ -122,59 +114,29 @@ export async function updateTaskHandler(req: Request, res: Response) {
 
     res.json(task);
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === "TASK_NOT_FOUND") {
-        res.status(404).json({
-          error: "Task not found",
-        });
-        return;
-      }
-
-      if (error.message === "DEVELOPER_NOT_FOUND") {
-        res.status(400).json({
-          error: "Developer does not exist",
-        });
-        return;
-      }
-
-      if (error.message === "DEVELOPER_MISSING_REQUIRED_SKILLS") {
-        res.status(400).json({
-          error: "Developer does not have all required skills",
-        });
-        return;
-      }
-
-      if (error.message === "SUBTASKS_NOT_DONE") {
-        res.status(400).json({
-          error: "Task cannot be completed while subtasks are incomplete",
-        });
-        return;
-      }
-    }
-
-    console.error("Failed to update task:", error);
-
-    res.status(500).json({
-      error: "Failed to update task",
-    });
+    next(error);
   }
 }
 
-export async function listTasks(req: Request, res: Response) {
+export async function listTasks(
+  req: Request, 
+  res: Response,
+  next: NextFunction
+) {
   try {
     const tasks = await getAllTasks();
 
     res.json(tasks);
   } catch (error) {
-    console.error("Failed to fetch tasks:", error);
-
-    res.status(500).json({
-      error: "Failed to fetch tasks",
-    });
+    next(error);
   }
 }
 
-export async function getTask(req: Request, res: Response) {
+export async function getTask(
+  req: Request, 
+  res: Response,
+  next: NextFunction
+) {
   try {
     const id = Number(req.params.id);
 
@@ -196,10 +158,6 @@ export async function getTask(req: Request, res: Response) {
 
     res.json(task);
   } catch (error) {
-    console.error("Failed to fetch task:", error);
-
-    res.status(500).json({
-      error: "Failed to fetch task",
-    });
+    next(error);
   }
 }

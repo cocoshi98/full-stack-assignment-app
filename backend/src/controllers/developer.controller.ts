@@ -1,22 +1,30 @@
-import type { Request, Response } from "express";
+import type { 
+  NextFunction,
+  Request, 
+  Response 
+} from "express";
 
 import { getAllDevelopers, getDeveloperById } from "../services/developer.service.js";
 
-export async function listDevelopers(req: Request, res: Response) {
+export async function listDevelopers(
+  req: Request, 
+  res: Response,
+  next: NextFunction
+) {
   try {
     const developers = await getAllDevelopers();
 
     res.json(developers);
   } catch (error) {
-    console.error("Failed to fetch developers:", error);
-
-    res.status(500).json({
-      error: "Failed to fetch developers",
-    });
+    next(error);
   }
 }
 
-export async function getDeveloper(req: Request, res: Response) {
+export async function getDeveloper(
+  req: Request, 
+  res: Response,
+  next: NextFunction
+) {
   try {
     const id = Number(req.params.id);
 
@@ -38,11 +46,7 @@ export async function getDeveloper(req: Request, res: Response) {
 
     res.json(developer);
   } catch (error) {
-    console.error("Failed to fetch developer:", error);
-
-    res.status(500).json({
-      error: "Failed to fetch developer",
-    });
+    next(error);
   }
 }
 
