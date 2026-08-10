@@ -12,7 +12,7 @@ import CreateTaskPage from "./pages/CreateTaskPage";
 export default function App() {
   return (
     <BrowserRouter>
-      <nav>
+      <nav className="main-nav">
         <Link to="/tasks">Tasks</Link>
         <Link to="/tasks/new">Create Task</Link>
       </nav>
