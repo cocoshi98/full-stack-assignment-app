@@ -12,6 +12,34 @@ import type {
   TaskStatus,
 } from "../types";
 
+function buildTaskTree(tasks: Task[]): Task[] {
+  const taskMap = new Map<number, Task>();
+
+  for (const task of tasks) {
+    taskMap.set(task.id, {
+      ...task,
+      subtasks: [],
+    });
+  }
+
+  const rootTasks: Task[] = [];
+
+  for (const task of taskMap.values()) {
+    if (task.parentTaskId === null) {
+      rootTasks.push(task);
+      continue;
+    }
+
+    const parentTask = taskMap.get(task.parentTaskId);
+
+    if (parentTask) {
+      parentTask.subtasks.push(task);
+    }
+  }
+
+  return rootTasks;
+}
+
 export default function TaskListPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [developers, setDevelopers] = useState<Developer[]>([]);
@@ -26,7 +54,7 @@ export default function TaskListPage() {
           getDevelopers(),
         ]);
 
-        setTasks(taskData);
+        setTasks(buildTaskTree(taskData));
         setDevelopers(developerData);
       } catch {
         setError("Failed to load task data");
@@ -46,16 +74,11 @@ export default function TaskListPage() {
     }
   ) {
     try {
-      const updatedTask = await updateTask(taskId, updates);
+      await updateTask(taskId, updates);
 
-      setTasks((currentTasks) =>
-        currentTasks.map((task) =>
-          task.id === updatedTask.id
-            ? updatedTask
-            : task
-        )
-      );
+      const taskData = await getTasks();
 
+      setTasks(buildTaskTree(taskData));
       setError(null);
     } catch (error) {
       setError(

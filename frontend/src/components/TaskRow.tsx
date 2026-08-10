@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import type {
   Developer,
   Task,
@@ -7,6 +9,8 @@ import type {
 interface TaskRowProps {
   task: Task;
   developers: Developer[];
+  depth?: number;
+
   onUpdate: (
     taskId: number,
     updates: {
@@ -19,6 +23,7 @@ interface TaskRowProps {
 export default function TaskRow({
   task,
   developers,
+  depth = 0,
   onUpdate,
 }: TaskRowProps) {
   const eligibleDevelopers = developers.filter((developer) => {
@@ -32,60 +37,85 @@ export default function TaskRow({
   });
 
   return (
-    <tr>
-      <td>{task.title}</td>
-
-      <td>
-        {task.skills.length === 0
-          ? "No skills"
-          : task.skills.map((skill) => skill.name).join(", ")}
-      </td>
-
-      <td>
-        <select
-          value={task.status}
-          onChange={(event) =>
-            onUpdate(
-              task.id,
-              {
-                status: event.target.value as TaskStatus,
-              }
-            )
-          }
+    <Fragment>
+      <tr>
+        <td
+          style={{
+            textAlign: "left",
+          }}
         >
-          <option value="TODO">To-do</option>
-          <option value="IN_PROGRESS">In Progress</option>
-          <option value="DONE">Done</option>
-        </select>
-      </td>
+          <div
+            style={{
+              paddingLeft: depth * 32,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {depth > 0 && "↳ "}
+            {task.title}
+          </div>
+        </td>
 
-      <td>
-        <select
-          value={task.developerId ?? ""}
-          onChange={(event) =>
-            onUpdate(
-              task.id,
-              {
+        <td>
+          {task.skills.length === 0
+            ? "No skills"
+            : task.skills
+                .map((skill) => skill.name)
+                .join(", ")}
+        </td>
+
+        <td>
+          <select
+            value={task.status}
+            onChange={(event) =>
+              onUpdate(task.id, {
+                status:
+                  event.target.value as TaskStatus,
+              })
+            }
+          >
+            <option value="TODO">To-do</option>
+            <option value="IN_PROGRESS">
+              In Progress
+            </option>
+            <option value="DONE">Done</option>
+          </select>
+        </td>
+
+        <td>
+          <select
+            value={task.developerId ?? ""}
+            onChange={(event) =>
+              onUpdate(task.id, {
                 developerId:
                   event.target.value === ""
                     ? null
                     : Number(event.target.value),
-              }
-            )
-          }
-        >
-          <option value="">Unassigned</option>
+              })
+            }
+          >
+            <option value="">Unassigned</option>
 
-          {eligibleDevelopers.map((developer) => (
-            <option
-              key={developer.id}
-              value={developer.id}
-            >
-              {developer.name}
-            </option>
-          ))}
-        </select>
-      </td>
-    </tr>
+            {eligibleDevelopers.map((developer) => (
+              <option
+                key={developer.id}
+                value={developer.id}
+              >
+                {developer.name}
+              </option>
+            ))}
+          </select>
+        </td>
+      </tr>
+
+      {task.subtasks.map((subtask) => (
+        <TaskRow
+          key={subtask.id}
+          task={subtask}
+          developers={developers}
+          depth={depth + 1}
+          onUpdate={onUpdate}
+        />
+      ))}
+    </Fragment>
   );
 }
