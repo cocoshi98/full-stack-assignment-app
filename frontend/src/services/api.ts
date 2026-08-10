@@ -7,6 +7,34 @@ import type {
 
 const API_BASE_URL = "http://localhost:3000/api";
 
+export interface CreateTaskInput {
+  title: string;
+  skillIds: number[];
+  parentTaskId?: number;
+}
+
+export async function createTask(
+  input: CreateTaskInput
+): Promise<Task> {
+  const response = await fetch(`${API_BASE_URL}/tasks`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+
+    throw new Error(
+      data?.error ?? "Failed to create task"
+    );
+  }
+
+  return response.json();
+}
+
 export async function getTasks(): Promise<Task[]> {
   const response = await fetch(`${API_BASE_URL}/tasks`);
 

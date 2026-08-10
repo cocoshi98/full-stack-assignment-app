@@ -23,3 +23,10 @@ export interface Task {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface TaskFormNodeData {
+  id: string;
+  title: string;
+  skillIds: number[];
+  subtasks: TaskFormNodeData[];
+}
