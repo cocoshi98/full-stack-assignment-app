@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import developerRoutes from "./routes/developer.routes.js";
+import skillRoutes from "./routes/skill.routes.js";
 
 const app = express();
 
@@ -13,6 +15,9 @@ app.get("/", (req, res) => {
     message: "Task Assignment API is running"
   });
 });
+
+app.use("/api/developers", developerRoutes);
+app.use("/api/skill", skillRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
