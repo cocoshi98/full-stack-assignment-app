@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 import { AppError } from "../errors/app-error.js";
+import { classifyTaskSkills } from "./skill-classifier.service.js";
 
 export interface CreateTaskInput {
   title: string;
@@ -12,8 +13,36 @@ export interface UpdateTaskInput {
   status?: "TODO" | "IN_PROGRESS" | "DONE";
 }
 
-export async function createTask(input: CreateTaskInput) {
-  const uniqueSkillIds = [...new Set(input.skillIds)];
+export async function createTask(input: CreateTaskInput) {  
+  let uniqueSkillIds = [...new Set(input.skillIds)];
+
+  if (uniqueSkillIds.length === 0) {
+    const classifiedSkillNames =
+      await classifyTaskSkills(input.title);
+
+    const classifiedSkills =
+      await prisma.skill.findMany({
+        where: {
+          name: {
+            in: classifiedSkillNames,
+          },
+        },
+      });
+
+    if (
+      classifiedSkills.length !==
+      classifiedSkillNames.length
+    ) {
+      throw new AppError(
+        500,
+        "Configured skills could not be found"
+      );
+    }
+
+    uniqueSkillIds = classifiedSkills.map(
+      (skill) => skill.id
+    );
+  }
 
   const skills = await prisma.skill.findMany({
     where: {
