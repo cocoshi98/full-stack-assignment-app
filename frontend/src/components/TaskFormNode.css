@@ -1,0 +1,105 @@
+.task-node {
+  position: relative;
+  width: 100%;
+}
+
+.task-node-content {
+  padding: 20px;
+  border: 1px solid #3a3d46;
+  border-radius: 8px;
+  background: #1b1d23;
+}
+
+.task-node-root > .task-node-content {
+  border-color: #50545f;
+}
+
+.task-node-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.task-node-field label,
+.task-node-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.task-node-field input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #4a4e59;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.task-node-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.task-node-skill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 1px solid #40444f;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.task-node-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.task-button {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.task-button-add {
+  font-weight: 600;
+}
+
+.task-button-remove {
+  opacity: 0.8;
+}
+
+.task-node-children {
+  position: relative;
+  margin-left: 26px;
+  padding-left: 24px;
+  border-left: 2px solid #3d414b;
+}
+
+.task-node-children > .task-node {
+  margin-top: 14px;
+}
+
+.task-node-children > .task-node::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  left: -24px;
+  width: 22px;
+  border-top: 2px solid #3d414b;
+}
+
+.task-node-branch {
+  margin-top: 12px;
+  margin-bottom: 5px;
+}
+
+.task-node-depth {
+  font-size: 12px;
+  opacity: 0.65;
+}

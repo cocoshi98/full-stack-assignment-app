@@ -3,6 +3,8 @@ import type {
   TaskFormNodeData,
 } from "../types";
 
+import "./TaskFormNode.css";
+
 interface TaskFormNodeProps {
   node: TaskFormNodeData;
   skills: Skill[];
@@ -77,80 +79,109 @@ export default function TaskFormNode({
   }
 
   return (
-    <section
-      style={{
-        marginLeft: depth * 24,
-        marginTop: 16,
-        padding: 16,
-        border: "1px solid #ccc",
-      }}
+    <div
+      className={`task-node ${
+        depth === 0 ? "task-node-root" : ""
+      }`}
     >
-      <div>
-        <label>
-          Title
+      {depth > 0 && (
+        <div className="task-node-branch">
+          <span className="task-node-depth">
+            Subtask level {depth}
+          </span>
+        </div>
+      )}
+
+      <div className="task-node-content">
+        <div className="task-node-field">
+          <label htmlFor={`title-${node.id}`}>
+            Task title
+          </label>
+
           <input
+            id={`title-${node.id}`}
             type="text"
             value={node.title}
+            placeholder={
+              depth === 0
+                ? "Enter task title"
+                : "Enter subtask title"
+            }
             onChange={(event) =>
               updateTitle(event.target.value)
             }
           />
-        </label>
-      </div>
+        </div>
 
-      <fieldset>
-        <legend>Required Skills</legend>
+        <div className="task-node-field">
+          <span className="task-node-label">
+            Required skills
+          </span>
 
-        {skills.map((skill) => (
-          <label key={skill.id}>
-            <input
-              type="checkbox"
-              checked={node.skillIds.includes(skill.id)}
-              onChange={() =>
-                toggleSkill(skill.id)
-              }
-            />
+          <div className="task-node-skills">
+            {skills.map((skill) => (
+              <label
+                key={skill.id}
+                className="task-node-skill"
+              >
+                <input
+                  type="checkbox"
+                  checked={node.skillIds.includes(
+                    skill.id
+                  )}
+                  onChange={() =>
+                    toggleSkill(skill.id)
+                  }
+                />
 
-            {skill.name}
-          </label>
-        ))}
-      </fieldset>
+                <span>{skill.name}</span>
+              </label>
+            ))}
+          </div>
+        </div>
 
-      <div>
-        <button
-          type="button"
-          onClick={addSubtask}
-        >
-          Add Subtask
-        </button>
-
-        {onRemove && (
+        <div className="task-node-actions">
           <button
             type="button"
-            onClick={onRemove}
+            onClick={addSubtask}
+            className="task-button task-button-add"
           >
-            Remove
+            + Add subtask
           </button>
-        )}
+
+          {onRemove && (
+            <button
+              type="button"
+              onClick={onRemove}
+              className="task-button task-button-remove"
+            >
+              Remove
+            </button>
+          )}
+        </div>
       </div>
 
-      {node.subtasks.map((subtask) => (
-        <TaskFormNode
-          key={subtask.id}
-          node={subtask}
-          skills={skills}
-          depth={depth + 1}
-          onChange={(updatedSubtask) =>
-            updateSubtask(
-              subtask.id,
-              updatedSubtask
-            )
-          }
-          onRemove={() =>
-            removeSubtask(subtask.id)
-          }
-        />
-      ))}
-    </section>
+      {node.subtasks.length > 0 && (
+        <div className="task-node-children">
+          {node.subtasks.map((subtask) => (
+            <TaskFormNode
+              key={subtask.id}
+              node={subtask}
+              skills={skills}
+              depth={depth + 1}
+              onChange={(updatedSubtask) =>
+                updateSubtask(
+                  subtask.id,
+                  updatedSubtask
+                )
+              }
+              onRemove={() =>
+                removeSubtask(subtask.id)
+              }
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

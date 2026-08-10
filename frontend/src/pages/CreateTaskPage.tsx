@@ -11,6 +11,8 @@ import type {
   TaskFormNodeData,
 } from "../types";
 
+import "./CreateTaskPage.css";
+
 const initialTask: TaskFormNodeData = {
   id: crypto.randomUUID(),
   title: "",
@@ -116,27 +118,39 @@ export default function CreateTaskPage() {
   }
 
   return (
-    <main>
-      <h1>Create Task</h1>
+    <main className="create-task-page">
+        <header className="create-task-header">
+            <h1>Create Task</h1>
 
-      {error && <p>{error}</p>}
+            <p className="create-task-description">
+            Create a task and optionally add nested subtasks.
+            </p>
+        </header>
 
-      <form onSubmit={handleSubmit}>
-        <TaskFormNode
-          node={task}
-          skills={skills}
-          onChange={setTask}
-        />
+        {error && (
+            <div className="create-task-error">
+            {error}
+            </div>
+        )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-        >
-          {submitting
-            ? "Creating..."
-            : "Create Task"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit}>
+            <TaskFormNode
+            node={task}
+            skills={skills}
+            onChange={setTask}
+            />
+
+            <div className="create-task-submit">
+            <button
+                type="submit"
+                disabled={submitting}
+            >
+                {submitting
+                ? "Creating..."
+                : "Create Task"}
+            </button>
+            </div>
+        </form>
     </main>
   );
 }
